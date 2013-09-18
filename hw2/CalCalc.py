@@ -4,7 +4,8 @@ def calculate(input_string,return_float=False):
 	try:
 		return eval(input_string, {'__builtins__':{}})
 	except (NameError, SyntaxError):
-		app_id = 'UAGAWR-3X6Y8W777Q'
+		#app_id = 'UAGAWR-3X6Y8W777Q'
+		app_id = 'WTHLUK-WR5TJQ8Y83'
 		f={'appid':app_id,'input': input_string}
 		api_url = 'http://api.wolframalpha.com/v2/query?' + urllib.urlencode(f)
 		xml_response = urllib2.urlopen(api_url).read()
@@ -21,12 +22,16 @@ def calculate(input_string,return_float=False):
 					pass	
 			if len(l)==0:
 				print "There is no float to return or could not parse the correct float."
-			return l	
-		return answer[1]
+				return l
+			if len(l)>1: 
+				print "More than one float was parsed from the answer.  Returning the first"
+				return l[0]
+			else: 
+				return l[0]
+		else:
+			return answer[1]
 
 if __name__== "__main__":
-	#import sys
-	#print calculate(str(sys.argv[1]))
 	import argparse
 	parser=argparse.ArgumentParser(description="Query the Wolfrm|Alpha API")
 	parser.add_argument("query",
@@ -43,5 +48,22 @@ if __name__== "__main__":
 	print calculate(" ".join(parser.parse_args().query),parser.parse_args().is_float)
 
 
-#def test_1():
-#	assert abs(9. - calculate('3*3'))<.001
+def test_1():
+	assert abs(9. - calculate('3*3',return_float=True))<.001
+
+def test_2():
+	query2 = "When was the Declaration of Independence signed?"
+	assert type(calculate(query2,return_float=True))==float
+
+def test_3():
+	query3 = "what color is the sky"
+	assert len(calculate(query3,return_float=True))==0
+
+def test_4():
+	assert calculate('3*3') == 9
+
+def test_5():
+	query5 = "How old is the world?"
+	assert type(calculate(query5))==str
+
+
