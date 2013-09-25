@@ -58,3 +58,6 @@ leg._drawFrame=False
 
 #show the plot
 plt.show()
+
+#save the plot
+plt.savefig('hw_3_2_plot.png')
