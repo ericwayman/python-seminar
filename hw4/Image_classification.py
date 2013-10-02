@@ -1,5 +1,6 @@
 #import relevant modules
 import skimage.io as io
+import pickle
 import numpy as np
 import re, sklearn
 from sklearn.ensemble import RandomForestClassifier
@@ -181,17 +182,4 @@ clf = RandomForestClassifier(n_estimators=50,n_jobs=-1,compute_importances=True)
 scores = sklearn.cross_validation.cross_val_score(clf,X,targ_array)
 print("Accuracy: %.2f (+/-%.2f)" %(scores.mean(),scores.std()*2))
 print scores
-
-
-def run_final_classifier(path,forest):
-    """Using the Random forest classifier model trained on the images in the folder
-    '50_categories', this function returns and prints the predictions for the labels
-    from the images located in 'path'.
-    inputs: path: the path where the test images are located.
-            forest: the RandomForestClassifier object trained on the image set in 
-                    '50_categories'
-    outputs: The predicted labels for the images in path.                                    
-    """
-
-
-
+pickle.dump(clf, open('trained_classifier.p','w'))
