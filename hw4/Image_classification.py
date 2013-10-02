@@ -19,7 +19,7 @@ from time import time
 
 #path to the folders of image categories
 #MYDIRECTORY = '/Users/waymaniac/Desktop/Py_for_data_sci/homework/hw4/50_categories'
-MYDIRECTORY = './50_categories'
+#MYDIRECTORY = './50_categories'
 
 # FUNCTION DEFINITIONS
 
@@ -28,22 +28,18 @@ MYDIRECTORY = './50_categories'
 #these functions compute and return a real numbered value feature of an image
 #all these functions take a 3d image array as an input and return a 
 #float representing an image feature as an output
-def feature_0(img):
-    """Computes the number of objects using edge-based segmentation.
-    """
-    from scipy import ndimage
-    from skimage.filter import canny
-    # if image is color, flatten the image to give a greyscale image
-    if img.ndim == 3:
-        img = img.mean(axis=2)
-    edges = canny(img/255.)
-    fill_img = ndimage.binary_fill_holes(edges)
-    label_objects, num_obj = ndimage.measurements.label(fill_img)
-    return num_obj
 
-def feature_1(img):
-    """Computes the number of large objects using edge-based segmentation.
-    Here a large object is one of size > 20
+
+####add compute max feature size relative to image size
+
+
+
+def feature_0(img):
+    """
+    Computes the number of objects and the number of large objects using edge-based segmentation.
+    Here a large object is one of size > 20.  
+    input: img- a 2d or 3d ndarray representing a greyscale or RGB image resp.
+    Returns: a list of the form: [num_obj, big_num_obj]
     """
     from scipy import ndimage
     from skimage.filter import canny
@@ -58,66 +54,72 @@ def feature_1(img):
     mask_sizes[0] = 0
     img_cleaned = mask_sizes[label_objects]
     big_label_objects, big_num_obj = ndimage.measurements.label(img_cleaned)
-    return big_num_obj
-def feature_2(img): 
+    max_obj = label_objects.max()
+    return [num_obj, big_num_obj]
+def feature_1(img): 
     """Computes the average local entropy over each pixel of the image.  
     The local entropy is computed over a disc of radius 5, and is an average of the local entropy over 
     the RGB channels or greyscale image if 2D
     input: a color or greyscale image img. 
-    returns: a float representing the average local entropy of the image.
+    returns: a list representing the avg local entropy over each of the 3 color channels
     """
     import numpy as np
     from skimage.filter.rank import entropy
     from skimage.morphology import disk
     if img.ndim==3:
-        ent_array = np.zeros(img.shape[0:2])
+        ent_list = []
         for i in [0,1,2]:
-            ent_array += entropy(img[:,:,i],disk(5))
-        return np.mean(ent_array)/3.0
+            ent_array = entropy(img[:,:,i],disk(5))
+            ent_list.append(np.mean(ent_array))
+        return ent_list
     else:
         ent_array = entropy(img,disk(5))
-        return np.mean(ent_array)
+        return [np.mean(ent_array)]*3
 
-def feature_3(img,i=0,j=1):
-    """Computes the maximum cross correlation between color channels i and j in the image
+def feature_2(img):
+    """Computes the maximum cross correlation between color channels i and j in the image for all color combinations
     inputs: a 3 color channel image: img, the indices of the channels for which the cross cor is computed: i,j
-    returns: the maximum correlation of the normalized images corresponding to channels i and j
+    returns: a list of the maximum correlations of the normalized images corresponding to channels i and j
     """
     import numpy as np
     from scipy.signal import fftconvolve as fftc
     #If only one color channel just return 0
     if img.ndim==2:
-        return 0
+        return [0]*6
     else:
-        img_1 = img[:,:,i]
-        img_2 = img[:,:,j]
-        #normalize the two color channels
-        im1_norm = (img_1-img_1.mean())/img_1.std()
-        im2_norm = (img_2-img_2.mean())/img_2.std()
-        corr = fftc(im1_norm,im2_norm, mode = 'same') #cross cor of the base image
-        return np.max(corr)
+        feature_list = []
+        for x in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)]:
+            img_1 = img[:,:,x[0]]
+            img_2 = img[:,:,x[1]]
+            #normalize the two color channels
+            im1_norm = (img_1-img_1.mean())/img_1.std()
+            im2_norm = (img_2-img_2.mean())/img_2.std()
+            corr = fftc(im1_norm,im2_norm, mode = 'same') #cross cor of the base image
+            feature_list.append(np.max(corr))
+        return feature_list
 
+def feature_3(img):
+    feature = img.size
+    return [feature]
 
-
-def compute_features(img, num_feat=4):
+def compute_features(img, num_funct=4):
     """
-    inputs: num_feat and integer representing the number of features to compute.
-    image: a 3 dim RGB image array on which to compute a list of features.
+    inputs: 
+        num_funct: the number of feature producing functions (some functs return a list of more than one feature
+        image: a 3 dim RGB image array on which to compute a list of features.
     Returns: a list of length num_feat containing the computed features for the image 
-    Assumes the features are given by functions labeled "feature_i" for i=0,..,num_feat-1
-    and that these feature functions return a float valued feature.
+    Assumes the features are given by functions labeled "feature_i" for i=0,..,num_funct-1
+    and that these feature functions return a list (possibly of only one element) containing float valued features.
     """
-    feature_list =[0]*num_feat
-    for i in range(num_feat):
+    feature_list =[]
+    for i in range(num_funct):
         func_name = 'feature_%s' %str(i)
         feature = globals()[func_name](img)
-        feature_list[i]=feature
-    #or to avoid the loop it might be faster if we replace it with lines like
-    #feature_list[0]=feature_0(img)
-    #feature_list[1]=feature_1(img)
-    #feature_list[2]=feature_2(img)
-    #feature_list[3]=feature_3(img)    
+        for j in range(len(feature)):
+            feature_list.append(feature[j])   
     return feature_list
+
+
 # Quick function to divide up a large list into multiple small lists, 
 # attempting to keep them all the same size. 
 def split_seq(seq, size):
@@ -322,5 +324,5 @@ def run_final_classifier(path,forest):
     print("________________________________")
     for i in range(len(file_name_list)):
         print("%s          %s" %(file_name_list[i],label_dict[prediction[i]]))
-#path = './50_categories/airplanes'
-#run_final_classifier(path,clf)
+path = './50_categories/goose'
+run_final_classifier(path,clf)
