@@ -37,7 +37,6 @@ def call_mirror_image(img_path, img_name):
 	#convert the list back to an image array
 	nd_result = np.asarray(result)
 	reshaped_nd_result = np.reshape(nd_result, nd_img_shape)
-
 	#plot and save the image
 	plt.imshow(reshaped_nd_result, cmap='gray')
 	plt.savefig("%s_mirror_client.png" %img_name)
@@ -59,7 +58,6 @@ def call_invert_color_channels(img_path, img_name):
 	#convert the list back to an image array
 	nd_result = np.asarray(result)
 	reshaped_nd_result = np.reshape(nd_result, nd_img_shape)
-
 	#plot and save the image
 	plt.imshow(reshaped_nd_result, cmap='gray')
 	plt.savefig("%s_invert_client.png" %img_name)
@@ -81,7 +79,6 @@ def call_permute_color_channels(img_path, img_name):
 	#convert the list back to an image array
 	nd_result = np.asarray(result)
 	reshaped_nd_result = np.reshape(nd_result, nd_img_shape)
-
 	#plot and save the image
 	plt.imshow(reshaped_nd_result, cmap='gray')
 	plt.savefig("%s_permute_client.png" %img_name)

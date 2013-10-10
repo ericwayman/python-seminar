@@ -42,11 +42,12 @@ class lossless_image_manipulation:
 				list_of_rows_reversed = [row[::-1] for row in list_of_rows]
 				reversed_array = np.asarray(list_of_rows_reversed)
 				mirror[:,:,i] = reversed_array
+		#include this line because all coler channels are getting inexplicably reversed
+		mirror = 255-mirror
 		plt.imshow(mirror)
 		plt.savefig("%s_mirror_server.png" %img_name)
-		#return array_to_list(mirror)
-		#trying this return instead since color channels seem inverted
-		return array_to_list(255-mirror)
+		return array_to_list(mirror)
+
 
 	def invert_color_channels(self,img_list,img_shape,img_name):
 		"""Reverses the color channels of the image
@@ -60,11 +61,12 @@ class lossless_image_manipulation:
 
 		#invert the image
 		invert_img = 255 - img_array
+		#include this line because all coler channels are getting inexplicably reversed
+		invert_img = 255-invert_img
 		plt.imshow(invert_img)
 		plt.savefig("%s_invert_server.png" %img_name)
-		#return array_to_list(invert_img)
-		#trying this return instead since color channels seem inverted
-		return array_to_list(255-invert_img)
+		return array_to_list(invert_img)
+
 
 
 	def permute_color_channels(self,img_list,img_shape,img_name):
@@ -85,11 +87,12 @@ class lossless_image_manipulation:
 				permute_img[:,:,i]=img_array[:,:,j]
 		else:
 			permute_img = img_array
+		#include this line because all coler channels are getting inexplicably reversed
+		permute_img = 255-permute_img
 		plt.imshow(permute_img)
 		plt.savefig("%s_permute_server.png" %img_name)
-		#return array_to_list(permute_img)
-		#trying this return instead since color channels seem inverted
-		return array_to_list(255-permute_img)
+		return array_to_list(permute_img)
+
 
 	#just a test function to see how the client server pair works
 	def return_gray_scale(self,img_list,img_shape):
