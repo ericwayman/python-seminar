@@ -154,6 +154,10 @@ def note_identifier(path, plt_name):
 	#compute the frequencies
 	freqs = np.fft.fftfreq(int_data.size, time[1]-time[0])
 
+	#take positive frequencies only
+	pos_ind = np.where(freqs > 0)
+	freqs = freqs[pos_ind]
+	power_spect = power_spect[pos_ind]
 
 	#location of max signal
 	indx = power_spect.argmax()

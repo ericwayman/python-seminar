@@ -31,14 +31,14 @@ The main notes computed from the test sound files are:
 
 The C0 values seem to be caused by negative frequencies.  Need to restrict the argmax() to positive frequencies only!  Also there seemed to be a lot of noise from my plots of the amplitudes.  I wasn't sure how to fix this.
 1.aif:G4
-2.aif:C0
-3.aif:C0
-4.aif:C0
-5.aif:C0
+2.aif:F4
+3.aif:E6
+4.aif:C4
+5.aif:D4
 6.aif:G6
 7.aif:A6
 8.aif:F5
 9.aif: G4
-10.aif: C0
+10.aif: G4
 11.aif: E6
-12.aif: C0
+12.aif: G4
