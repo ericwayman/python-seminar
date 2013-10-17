@@ -1,5 +1,6 @@
 import sqlite3
 import numpy as np
+from scipy.stats import pearsonr
 #connect to the airport database "airport.db"
 connection = sqlite3.connect("airport.db")
 cursor = connection.cursor()
@@ -79,12 +80,99 @@ for i in range(num_airports):
 
 		#compute the correlation between the ith signal and the jth shifted signal
 		#and entry it as the (i,j) entry of the appropriate matrix
-		temp_pred_1[i,j]=np.correlate(t_1,t_shift_1)[0]
-		temp_pred_3[i,j]=np.correlate(t_3,t_shift_3)[0]
-		temp_pred_7[i,j]=np.correlate(t_7,t_shift_7)[0]
-		cover_pred_1[i,j]=np.correlate(c_1,c_shift_1)[0]
-		cover_pred_3[i,j]=np.correlate(c_3,c_shift_3)[0]
-		cover_pred_7[i,j]=np.correlate(c_7,c_shift_7)[0]
+		
+		#some signals have shorter length.  Only compute correlation if the length is the same
+		if (len(t_1)==len(t_shift_1)):
+			temp_pred_1[i,j]=pearsonr(t_1,t_shift_1)[0]
+		else:
+			temp_pred_1[i,j]=0
 
+		if (len(t_3)==len(t_shift_3)):
+			temp_pred_3[i,j]=pearsonr(t_3,t_shift_3)[0]
+		else:
+			temp_pred_7[i,j]=0
+		if (len(t_7)==len(t_shift_7)):
+			temp_pred_7[i,j]=pearsonr(t_7,t_shift_7)[0]
+		else:
+			temp_pred_7[i,j]=0	
+	
+		if (len(c_1)==len(c_shift_1)):
+			cover_pred_1[i,j]=pearsonr(c_1,c_shift_1)[0]
+		else:
+			cover_pred_1[i,j]=0
+		if (len(c_3)==len(c_shift_3)):
+			cover_pred_3[i,j]=pearsonr(c_3,c_shift_3)[0]
+		else:
+			cover_pred_3[i,j]=0
+		if (len(c_7)==len(c_shift_7)):
+			cover_pred_7[i,j]=pearsonr(c_7,c_shift_7)[0]
+		else:
+			cover_pred_7[i,j]=0
 
+#print summary of predictions
 
+n=num_airports
+
+#temp change predicitions
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_t1 = (temp_pred_1.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_t1 = [(i/n,i%n-1) for i in flat_idxs_t1]
+print "The 10 highest 1 day offset temp change correlations are:"
+for i in range(len(idxs_t1)):
+	print "The %i largest correlation is:" %(i+1)
+	print temp_pred_1.flatten()[flat_idxs_t1[i]]
+	print "when using airport %s to predict weather in %s 1 day later" %(icao_codes[idxs_t1[i][0]],icao_codes[idxs_t1[i][1]])
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_t3 = (temp_pred_3.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_t3 = [(i/n,i%n-1) for i in flat_idxs_t3]
+print "The 10 highest 3 day offset temp change correlations are:"
+for i in range(len(idxs_t3)):
+	print "The %i largest correlation is:" %(i+1)
+	print temp_pred_3.flatten()[flat_idxs_t3[i]]
+	print "when using airport %s to predict weather in %s 3 days later" %(icao_codes[idxs_t3[i][0]],icao_codes[idxs_t3[i][1]])
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_t7 = (temp_pred_7.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_t7 = [(i/n,i%n-1) for i in flat_idxs_t7]
+print "The 10 highest 7 day offset temp change correlations are:"
+for i in range(len(idxs_t7)):
+	print "The %i largest correlation is:" %(i+1)
+	print temp_pred_7.flatten()[flat_idxs_t7[i]]
+	print "when using airport %s to predict  weather in %s 7 days later" %(icao_codes[idxs_t7[i][0]],icao_codes[idxs_t7[i][1]])
+
+#cloud cover change predicitions
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_c1 = (cover_pred_1.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_c1 = [(i/n,i%n-1) for i in flat_idxs_c1]
+print "The 10 highest 1 day offset cloud cover change correlations are:"
+for i in range(len(idxs_c1)):
+	print "The %i largest correlation is:" %(i+1)
+	print cover_pred_1.flatten()[flat_idxs_c1[i]]
+	print "when using airport %s to predict  cloud cover change in %s 1 day later" %(icao_codes[idxs_c1[i][0]],icao_codes[idxs_c1[i][1]])
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_c3 = (cover_pred_3.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_c3 = [(i/n,i%n-1) for i in flat_idxs_c3]
+print "The 10 highest 3 day offset cloud cover change correlations are:"
+for i in range(len(idxs_c3)):
+	print "The %i largest correlation is:" %(i+1)
+	print cover_pred_3.flatten()[flat_idxs_c3[i]]
+	print "when using airport %s to predict  cloud cover change in %s 3 days later" %(icao_codes[idxs_c3[i][0]],icao_codes[idxs_c3[i][1]])
+
+#computes the top 10 1 dimensional indices.  Need to convert to two dim using mods
+flat_idxs_c7 = (cover_pred_7.flatten()).argsort()[-10:][::-1]
+#convert a flat index back to a 2d index
+idxs_c7 = [(i/n,i%n-1) for i in flat_idxs_c7]
+print "The 10 highest 7 day offset cloud cover change correlations are:"
+for i in range(len(idxs_c7)):
+	print "The %i largest correlation is:" %(i+1)
+	print cover_pred_7.flatten()[flat_idxs_c7[i]]
+	print "when using airport %s to predict  cloud cover change in %s 7 days later" %(icao_codes[idxs_c7[i][0]],icao_codes[idxs_c7[i][1]])
