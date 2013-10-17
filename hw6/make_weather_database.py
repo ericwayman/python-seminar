@@ -1,3 +1,9 @@
+#Makes a database airport.db which has two tables airports and weather
+#airports has the following fields for the 50 most traveled airports in the us
+#city, faa, iata, icao, airport, enplanements
+#weather has the following fields for the same airports:
+#icao, the_date, max_temp, mean_temp, min_temp, cloud_cover, precip_in
+
 import pandas as pd
 import sqlite3, urllib2
 from bs4 import BeautifulSoup
@@ -107,7 +113,6 @@ for x in iterates:
 	#output.close()
 
 	print "making the weather table"
-	print "adding: "+file_name
 	#save the table as a pandas dataframe
 	df = pd.read_csv('./csv_files/'+file_name, delimiter=',')
 
