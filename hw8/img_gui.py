@@ -1,4 +1,6 @@
-#embedding matplotlib in tkinter
+#Creates a GUI to to allow for an image search via google images
+#The gui also features 3 buttons for image manipulation
+#An image can be rotated 90 degrees clockwise, flipped about the yaxis or made into a gray scale
 
 #query url  http://images.google.com/search?tbm=isch&q="your+query"
 #imports
