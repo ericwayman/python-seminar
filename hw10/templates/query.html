@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% set page_title = 'Query the Database' %}
+{% block content %}
+			<li><a href=/>Back to Main Page</a></li>
+            <form action="query" method="POST">
+            Query string:
+            <input type="text" name="query" />
+            <input type="submit" />
+            </form>
+{% endblock %}
