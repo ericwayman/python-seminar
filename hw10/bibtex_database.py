@@ -15,7 +15,7 @@ eng = db.create_engine('sqlite:////tmp/bib.db')
 #configure app to allow files to be uploaded to '/tmp/'
 #this will handle the bibtex files that a user can upload
 UPLOAD_FOLDER = '/tmp/'
-ALLOWED_EXTENSIONS = set(['txt','bib'])
+ALLOWED_EXTENSIONS = set(['bib'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
