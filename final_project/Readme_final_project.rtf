@@ -1,0 +1,68 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;}
+\margl1440\margr1440\vieww12780\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 Readme for final project for Eric Wayman for AY250 12/11/13\
+\
+\
+The final project contains the following files:\
+\
+arrivalDataNew.json\
+scheduledArrivalDataNew.json\
+bus_database.py\
+update_bus_database.ipynb\
+make_bus_predictions.ipynb\
+\pard\pardeftab720
+
+\f1\fs26 \cf2 \
+This project is concerned with making predictions on bus data gathered over a several month periods.  The data comes from a bus line in San Sebastian, Spain.  It was collected live from tablets installed on the buses.\
+\
+\
+The data fields of 
+\f0\fs24 \cf0 arrivalDataNew.json are given below in \'93 \'94 along with a sample value and a brief description in ():\
+\
+
+\f1\fs26 \cf2 \
+\{\
+"arrival_time": 1380201998000, (Unix time, I will include a little code snippet that shows how to parse this and turn them into datetime format)\
+\'a0 "bus_id": "485", (unique vehicle identifier)\
+\'a0 "delay": 289569, \'a0(delay in milliseconds, negative values indicate earliness)\
+\'a0 "demand": 23, (demand rate, in pax/hr corresponding to the hour and type of day in which the arrival took place)\
+\'a0 "departure_time": 1380202019000, (Unix time, departure time from that stop)\
+\'a0 "driver_id": "485", (unique driver identifier)\
+\'a0 "dwell_diff": 16444, (difference between the recommended dwell time by our control and the actual dwell time)\
+\'a0 "dwell_time": 21.0, (dwell time in seconds)\
+\'a0 "estimated_boardings": 10, (estimated number of pax boardings = demand rate * headway)\
+\'a0 "headway": 331.001, (time interval from the previous bus arrival at the stop, seconds)\'a0\
+\'a0 "headway_dev": -28.999000000000024, (deviation between the expected headway and the actual)\
+\'a0 "recommended_dwell": 0, (dwell time recommended by our control)\'a0\
+\'a0 "route_id": "5", (route identifier)\
+\'a0 "route_id_preceding": "5", (route of the preciding bus)\
+\'a0 "sch_headway": 360, (expected headway in seconds)\
+\'a0 "sch_headway_own": 360, (expected headway between buses of the same line in seconds)\
+\'a0 "service_id": "611", (service id for that day)\
+\'a0 "stop_id": "46", (stop identifier. ranges from 37 (last stop) to 46 (first stop))\
+\'a0 "stop_pm": 258.22, (stop postmile along the trip)\
+\'a0 "stop_seq": 2, (stop sequence along the trip)\
+\'a0 "theta": 2.114728611111111, (poisson parameter estimated as demand rate/boarding time per pax)\
+\'a0 "trip_id": "06110005000215210102" (unique trip identifier)\
+\}\
+\
+The running the file 
+\f0\fs24 \cf0 bus_database.py  inputs the data files arrivalDataNew.json and scheduledArrivalDataNew.json into a SQL database\
+\
+The notebook file update_bus_database.ipynb uses the database containing the arrivalDataNew.json data to form a databasee \'91bus_predicition_data\'92 which has the following fields:\
+trip_id, bus_id, arrival_time, stop_id, demand, delay, and the new fields:  k_prev_stop_delay and k_pred_delay (for k =1,2..,7)\
+\
+The new field k_prev_stop_delay is the delay experienced by the bus on the present trip k stops before the on the route previous to the stop of the current row.  That is if the current location is stop #x, it represents the delay at stop #(x+k) (the buses advance along the stops in descending order.) faced by the bus along the route \
+The new field k_pred_delay is the delay experienced by a predecessor- that is the last bus on the route to arrive at stop x before the current time, where the current time is the time of the current bus\'92s arrival to stop #(x+k).  \
+The idea is to use the demand, k_prev_stop_delay and k_pred_delay fields to predict the delay a bus will face at stop #x given the information that is available while it is k stops away from stop #x after arriving at stop #(x+k).\
+ \
+The file make_bus_predictions.ipynb fits a randomly selected half of the data (after removing rows with missing data) to a regression tree using the module sklearn. The remaining half of the data is used as test data to compute the normalized L2-loss from the predictions over the actual data (i.e. ||Y_actual - Y_pred ||_2/||Y_actual ||_2 ).  These predictions are averaged over 100 trees to predict an estimate of the decline quality of the predictions when predicting the delay k stopes in advance where k ranges from 1 to 4.  \
+The average normalized L2_loss of the 100 trials for k=1,2,3 and 4 respectively are .17,.23,.38 and .70.\
+\
+Future plans are to continue to work with the data to make more predictions.  Some early ideas are to find more fields to add to the current prediction model and as well as to apply more sophisticated modeling methods such as neural networks.  \
+\
+}
